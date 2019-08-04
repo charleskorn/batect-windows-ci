@@ -56,12 +56,6 @@ function checkDocker {
     Write-Output ""
 
     checkApp 'Docker' 'docker' 'version' 'OS/Arch:          linux/amd64'
-
-    docker run --rm alpine:3.10 sh -c 'echo Hello world!'
-
-    if ($LastExitCode -ne 0) {
-        Write-Error "Docker is not configured correctly"
-    }
 }
 
 function checkPython {
