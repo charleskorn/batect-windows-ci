@@ -35,13 +35,17 @@ powershell -command "Switch-DockerLinux"
 
 Write-Host "Done"
 
-Write-Host "Setting up final docker steps to run at RunOnce"
+$containersFeature = (Get-WindowsOptionalFeature -FeatureName Containers -Online)
+if ($containersFeature -and $containersFeature.State -ne 'Enabled') {
+    Write-Host "Installing Containers feature..."
+    Enable-WindowsOptionalFeature -FeatureName Containers -Online -All -NoRestart
+} else {
+    Write-Host "Containers feature already installed."
+}
 
-(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/appveyor/ci/master/scripts/prepare-docker.ps1', "$env:ProgramFiles\AppVeyor\prepare-docker.ps1")
-
-# Prepare docker on the next start
-New-Item "HKCU:\Software\Microsoft\Windows\CurrentVersion" -Name "RunOnce" -Force | Out-Null
-
-Set-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\RunOnce" -Name "!prepare-docker" -Value 'powershell -File "C:\Program Files\AppVeyor\prepare-docker.ps1"'
-
-Write-Host "Done"
+if ((Get-WmiObject Win32_Processor).VirtualizationFirmwareEnabled[0] -and (Get-WmiObject Win32_Processor).SecondLevelAddressTranslationExtensions[0]) {
+    Write-Host "Installing Hyper-V feature..."
+    Install-WindowsFeature -Name Hyper-V -IncludeManagementTools
+} else {
+    Write-Error "Can't install Hyper-V: virtualization is not enabled."
+}
