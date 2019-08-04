@@ -57,7 +57,7 @@ function checkDocker {
 
     checkApp 'Docker' 'docker' 'version' 'OS/Arch:          linux/amd64'
 
-    docker run --rm -v c:\windows\system32\kernel32.dll:/test.dll alpine:3.10 sh -c 'if [ ! -f /test.dll ]; then echo \"File does not exist! Mounting C: directory may not be configured correctly.\" && exit 1; fi'
+    docker run --rm alpine:3.10 sh -c 'echo Hello world!'
 
     if ($LastExitCode -ne 0) {
         Write-Error "Docker is not configured correctly"
